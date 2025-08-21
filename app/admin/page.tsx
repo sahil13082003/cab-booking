@@ -144,14 +144,14 @@ export default function AdminLoginPage() {
               </Button>
             </form>
 
-            <div className="mt-6 pt-4 border-t text-center">
+            {/* <div className="mt-6 pt-4 border-t text-center">
               <p className="text-sm text-muted-foreground mb-2">Demo Credentials:</p>
               <p className="text-xs text-muted-foreground">
                 Email: admin@wardhacabs.com
                 <br />
                 Password: admin123
               </p>
-            </div>
+            </div> */}
           </CardContent>
         </Card>
 
