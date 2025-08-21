@@ -1,205 +1,125 @@
-"use client"
+"use client";
 
-import { useState, useEffect } from "react"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { Car, Users, MapPin, LogOut, Shield, Search, BarChart3 } from "lucide-react"
-import { useRouter } from "next/navigation"
+import { useState, useEffect } from "react";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Car, Users, MapPin, LogOut, Shield, Search, BarChart3 } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 interface Booking {
-  id: string
-  customerName: string
-  customerPhone: string
-  pickup: string
-  dropLocation: string
-  date: string
-  time: string
-  vehicleType: string
-  status: "pending" | "confirmed" | "in-progress" | "completed" | "cancelled"
-  driverName: string
-  totalAmount: number
-  distance: number
+  id: string;
+  customerName: string;
+  customerPhone: string;
+  pickup: string;
+  dropLocation: string;
+  date: string;
+  time: string;
+  vehicleType: string;
+  status: "pending" | "confirmed" | "in-progress" | "completed" | "cancelled";
+  driverName: string;
+  totalAmount: number;
+  distance: number;
 }
 
 interface Vehicle {
-  id: string
-  type: string
-  model: string
-  licensePlate: string
-  status: "available" | "booked" | "maintenance"
-  driverName: string
-  currentLocation: string
+  id: string;
+  type: string;
+  model: string;
+  licensePlate: string;
+  status: "available" | "booked" | "maintenance";
+  driverName: string;
+  currentLocation: string;
 }
 
-const mockBookings: Booking[] = [
-  {
-    id: "WC12345678",
-    customerName: "John Doe",
-    customerPhone: "+91 98765 43210",
-    pickup: "Wardha",
-    dropLocation: "Mumbai Airport",
-    date: "2024-12-25",
-    time: "08:00",
-    vehicleType: "SUV",
-    status: "confirmed",
-    driverName: "Rajesh Kumar",
-    totalAmount: 12960,
-    distance: 720,
-  },
-  {
-    id: "WC87654321",
-    customerName: "Jane Smith",
-    customerPhone: "+91 98765 43211",
-    pickup: "Wardha",
-    dropLocation: "Nagpur",
-    date: "2024-12-20",
-    time: "14:30",
-    vehicleType: "Sedan",
-    status: "in-progress",
-    driverName: "Amit Sharma",
-    totalAmount: 936,
-    distance: 78,
-  },
-  {
-    id: "WC11111111",
-    customerName: "Priya Patel",
-    customerPhone: "+91 98765 43212",
-    pickup: "Wardha",
-    dropLocation: "Pune",
-    date: "2024-12-15",
-    time: "09:00",
-    vehicleType: "SUV",
-    status: "completed",
-    driverName: "Pradeep Singh",
-    totalAmount: 9360,
-    distance: 520,
-  },
-  {
-    id: "WC22222222",
-    customerName: "Rahul Gupta",
-    customerPhone: "+91 98765 43213",
-    pickup: "Wardha",
-    dropLocation: "Nashik",
-    date: "2024-12-10",
-    time: "16:00",
-    vehicleType: "Sedan",
-    status: "pending",
-    driverName: "Vikram Patil",
-    totalAmount: 4560,
-    distance: 380,
-  },
-]
-
-const mockVehicles: Vehicle[] = [
-  {
-    id: "V001",
-    type: "Sedan",
-    model: "Honda City",
-    licensePlate: "MH-31-AB-1234",
-    status: "available",
-    driverName: "Rajesh Kumar",
-    currentLocation: "Wardha",
-  },
-  {
-    id: "V002",
-    type: "SUV",
-    model: "Mahindra Scorpio",
-    licensePlate: "MH-31-CD-5678",
-    status: "booked",
-    driverName: "Amit Sharma",
-    currentLocation: "En route to Nagpur",
-  },
-  {
-    id: "V003",
-    type: "Luxury",
-    model: "Toyota Camry",
-    licensePlate: "MH-31-EF-9012",
-    status: "maintenance",
-    driverName: "Pradeep Singh",
-    currentLocation: "Service Center",
-  },
-  {
-    id: "V004",
-    type: "SUV",
-    model: "Tata Safari",
-    licensePlate: "MH-31-GH-3456",
-    status: "available",
-    driverName: "Vikram Patil",
-    currentLocation: "Wardha",
-  },
-]
-
 export default function AdminDashboardPage() {
-  const [bookings, setBookings] = useState<Booking[]>(mockBookings)
-  const [vehicles, setVehicles] = useState<Vehicle[]>(mockVehicles)
-  const [searchTerm, setSearchTerm] = useState("")
-  const [statusFilter, setStatusFilter] = useState("all")
-  const [selectedBooking, setSelectedBooking] = useState<Booking | null>(null)
-  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false)
-  const router = useRouter()
+  const [bookings, setBookings] = useState<Booking[]>([]);
+  const [vehicles, setVehicles] = useState<Vehicle[]>([]);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [statusFilter, setStatusFilter] = useState("all");
+  const [selectedBooking, setSelectedBooking] = useState<Booking | null>(null);
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const router = useRouter();
 
   useEffect(() => {
-    // Check authentication
-    const isAuthenticated = localStorage.getItem("adminAuth")
-    if (!isAuthenticated) {
-      router.push("/admin")
-    }
-  }, [router])
+    const fetchData = async () => {
+      try {
+        const [bookingsResponse, vehiclesResponse] = await Promise.all([
+          fetch('/api/bookings'),
+          fetch('/api/vehicles'),
+        ]);
+        if (!bookingsResponse.ok) throw new Error('Failed to fetch bookings');
+        if (!vehiclesResponse.ok) throw new Error('Failed to fetch vehicles');
+        const bookingsData = await bookingsResponse.json();
+        const vehiclesData = await vehiclesResponse.json();
+
+        setBookings(bookingsData);
+        setVehicles(vehiclesData);
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  
 
   const handleLogout = () => {
-    localStorage.removeItem("adminAuth")
-    router.push("/admin")
-  }
+    document.cookie = "adminToken=; Max-Age=0; path=/"; // Clear cookie
+    router.push("/admin");
+  };
 
   const getStatusColor = (status: string) => {
     switch (status) {
       case "confirmed":
-        return "bg-green-100 text-green-800 border-green-200"
+        return "bg-green-100 text-green-800 border-green-200";
       case "pending":
-        return "bg-yellow-100 text-yellow-800 border-yellow-200"
+        return "bg-yellow-100 text-yellow-800 border-yellow-200";
       case "in-progress":
-        return "bg-blue-100 text-blue-800 border-blue-200"
+        return "bg-blue-100 text-blue-800 border-blue-200";
       case "completed":
-        return "bg-primary/10 text-primary border-primary/20"
+        return "bg-primary/10 text-primary border-primary/20";
       case "cancelled":
-        return "bg-red-100 text-red-800 border-red-200"
+        return "bg-red-100 text-red-800 border-red-200";
       case "available":
-        return "bg-green-100 text-green-800 border-green-200"
+        return "bg-green-100 text-green-800 border-green-200";
       case "booked":
-        return "bg-blue-100 text-blue-800 border-blue-200"
+        return "bg-blue-100 text-blue-800 border-blue-200";
       case "maintenance":
-        return "bg-orange-100 text-orange-800 border-orange-200"
+        return "bg-orange-100 text-orange-800 border-orange-200";
       default:
-        return "bg-gray-100 text-gray-800 border-gray-200"
+        return "bg-gray-100 text-gray-800 border-gray-200";
     }
-  }
+  };
 
   const updateBookingStatus = (bookingId: string, newStatus: string) => {
     setBookings((prev) =>
       prev.map((booking) => (booking.id === bookingId ? { ...booking, status: newStatus as any } : booking)),
-    )
-  }
+    );
+    // TODO: Sync with DB via PUT request to /api/bookings/[id]
+  };
 
   const updateVehicleStatus = (vehicleId: string, newStatus: string) => {
     setVehicles((prev) =>
       prev.map((vehicle) => (vehicle.id === vehicleId ? { ...vehicle, status: newStatus as any } : vehicle)),
-    )
-  }
+    );
+    // TODO: Sync with DB via PUT request to /api/vehicles/[id]
+  };
 
   const filteredBookings = bookings.filter((booking) => {
     const matchesSearch =
       booking.customerName.toLowerCase().includes(searchTerm.toLowerCase()) ||
       booking.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      booking.dropLocation.toLowerCase().includes(searchTerm.toLowerCase())
-    const matchesStatus = statusFilter === "all" || booking.status === statusFilter
-    return matchesSearch && matchesStatus
-  })
+      booking.dropLocation.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesStatus = statusFilter === "all" || booking.status === statusFilter;
+    return matchesSearch && matchesStatus;
+  });
 
   return (
     <div className="min-h-screen bg-background">
@@ -477,5 +397,5 @@ export default function AdminDashboardPage() {
         </Tabs>
       </div>
     </div>
-  )
+  );
 }

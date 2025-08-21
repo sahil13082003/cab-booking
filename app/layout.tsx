@@ -18,10 +18,16 @@ const openSans = Open_Sans({
 })
 
 export const metadata: Metadata = {
-  title: "Wardha Cabs - Reliable Transportation Services",
-  description: "Professional cab booking and car rental services from Wardha. Book your ride today!",
-  generator: "v0.app",
-}
+  title: "Wardha Cabs - Reliable Cab Booking in Maharashtra",
+  description: "Book safe and comfortable cabs from Wardha to anywhere. Sedans, SUVs, and luxury cars available 24/7.",
+  keywords: ["cab booking", "Wardha cabs", "taxi service", "Maharashtra travel"],
+  openGraph: {
+    title: "Wardha Cabs",
+    description: "Reliable transportation services from Wardha to anywhere.",
+    images: ["/modern-suv-side.png"],
+  },
+};
+
 
 export default function RootLayout({
   children,

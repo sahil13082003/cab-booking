@@ -26,33 +26,31 @@ interface BookingDetails {
 }
 
 export default function BookingConfirmationPage() {
-  const [bookingDetails, setBookingDetails] = useState<BookingDetails | null>(null)
-  const [isLoading, setIsLoading] = useState(true)
+  const [bookingDetails, setBookingDetails] = useState<BookingDetails | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
 
-  useEffect(() => {
-    // Simulate API call to fetch booking details
-    const timer = setTimeout(() => {
-      setBookingDetails({
-        bookingId: "WC" + Math.random().toString(36).substr(2, 8).toUpperCase(),
-        status: "confirmed",
-        pickup: "Wardha",
-        dropLocation: "Mumbai Airport",
-        date: "2024-12-25",
-        time: "08:00",
-        passengers: "4",
-        vehicleType: "SUV",
-        vehicleModel: "Mahindra Scorpio",
-        driverName: "Rajesh Kumar",
-        driverPhone: "+91 98765 43210",
-        estimatedDistance: 720,
-        totalAmount: 12960,
-        bookingTime: new Date().toLocaleString(),
+useEffect(() => {
+  const urlParams = new URLSearchParams(window.location.search);
+  const bookingId = urlParams.get('bookingId') || localStorage.getItem('bookingId');
+
+  if (bookingId) {
+    fetch(`/api/bookings/${bookingId}`)
+      .then(res => {
+        if (!res.ok) throw new Error('Booking not found');
+        return res.json();
       })
-      setIsLoading(false)
-    }, 1500)
-
-    return () => clearTimeout(timer)
-  }, [])
+      .then(data => {
+        setBookingDetails(data);
+        setIsLoading(false);
+      })
+      .catch(error => {
+        console.error('Error fetching booking:', error);
+        setIsLoading(false);
+      });
+  } else {
+    setIsLoading(false);
+  }
+}, []);
 
   const getStatusColor = (status: string) => {
     switch (status) {

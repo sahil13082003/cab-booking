@@ -106,14 +106,44 @@ export default function BookingPage() {
     setBookingData((prev) => ({ ...prev, vehicleType: vehicle.type }))
   }
 
-  const handleBookingSubmit = () => {
-    setIsLoading(true)
-    // Simulate API call
-    setTimeout(() => {
-      setIsLoading(false)
-      setShowSummary(true)
-    }, 2000)
+ const handleBookingSubmit = async () => {
+  setIsLoading(true);
+  try {
+    const response = await fetch('/api/bookings', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        customerName: 'User Name', // Replace with actual user data
+        customerPhone: '+91 98765 43210', // Replace with actual user data
+        pickup: bookingData.pickup,
+        dropLocation: bookingData.dropLocation,
+        date: bookingData.date,
+        time: bookingData.time,
+        vehicleType: selectedVehicle?.type,
+        totalAmount: calculateTotalPrice(),
+        distance: estimatedDistance,
+      }),
+    });
+
+    const data = await response.json();
+    console.log('Booking response:', data);
+
+    if (!response.ok) {
+      throw new Error(data.error || 'Booking failed');
+    }
+
+    // Store booking ID for confirmation page
+    localStorage.setItem('bookingId', data.bookingId);
+
+    // Redirect to confirmation page with booking ID
+    window.location.href = `/booking/confirmation?bookingId=${data.bookingId}`;
+  } catch (err: any) {
+    console.error('Booking error:', err);
+    // Show error toast or alert
+  } finally {
+    setIsLoading(false);
   }
+};
 
   const calculateTotalPrice = () => {
     if (!selectedVehicle || !estimatedDistance) return 0

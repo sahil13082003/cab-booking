@@ -1,11 +1,11 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { useState, useEffect } from "react";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   Car,
   MapPin,
@@ -20,129 +20,98 @@ import {
   Settings,
   LogOut,
   Home,
-} from "lucide-react"
-import Link from "next/link"
+} from "lucide-react";
+import Link from "next/link";
 
 interface Booking {
-  id: string
-  status: "upcoming" | "in-progress" | "completed" | "cancelled"
-  pickup: string
-  dropLocation: string
-  date: string
-  time: string
-  vehicleType: string
-  driverName: string
-  driverPhone: string
-  totalAmount: number
-  distance: number
-  rating?: number
+  id: string;
+  status: "upcoming" | "in-progress" | "completed" | "cancelled";
+  pickup: string;
+  dropLocation: string;
+  date: string;
+  time: string;
+  vehicleType: string;
+  driverName: string;
+  driverPhone: string;
+  totalAmount: number;
+  distance: number;
+  rating?: number;
 }
 
-const currentBookings: Booking[] = [
-  {
-    id: "WC12345678",
-    status: "upcoming",
-    pickup: "Wardha",
-    dropLocation: "Mumbai Airport",
-    date: "2024-12-25",
-    time: "08:00",
-    vehicleType: "SUV",
-    driverName: "Rajesh Kumar",
-    driverPhone: "+91 98765 43210",
-    totalAmount: 12960,
-    distance: 720,
-  },
-  {
-    id: "WC87654321",
-    status: "in-progress",
-    pickup: "Wardha",
-    dropLocation: "Nagpur",
-    date: "2024-12-20",
-    time: "14:30",
-    vehicleType: "Sedan",
-    driverName: "Amit Sharma",
-    driverPhone: "+91 98765 43211",
-    totalAmount: 936,
-    distance: 78,
-  },
-]
-
-const pastBookings: Booking[] = [
-  {
-    id: "WC11111111",
-    status: "completed",
-    pickup: "Wardha",
-    dropLocation: "Pune",
-    date: "2024-12-15",
-    time: "09:00",
-    vehicleType: "SUV",
-    driverName: "Pradeep Singh",
-    driverPhone: "+91 98765 43212",
-    totalAmount: 9360,
-    distance: 520,
-    rating: 5,
-  },
-  {
-    id: "WC22222222",
-    status: "completed",
-    pickup: "Wardha",
-    dropLocation: "Nashik",
-    date: "2024-12-10",
-    time: "16:00",
-    vehicleType: "Sedan",
-    driverName: "Vikram Patil",
-    driverPhone: "+91 98765 43213",
-    totalAmount: 4560,
-    distance: 380,
-    rating: 4,
-  },
-  {
-    id: "WC33333333",
-    status: "cancelled",
-    pickup: "Wardha",
-    dropLocation: "Aurangabad",
-    date: "2024-12-05",
-    time: "11:00",
-    vehicleType: "Luxury",
-    driverName: "N/A",
-    driverPhone: "N/A",
-    totalAmount: 7000,
-    distance: 280,
-  },
-]
-
 export default function DashboardPage() {
-  const [activeTab, setActiveTab] = useState("current")
+  const [activeTab, setActiveTab] = useState("current");
+  const [currentBookings, setCurrentBookings] = useState<Booking[]>([]);
+  const [pastBookings, setPastBookings] = useState<Booking[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+  const fetchBookings = async () => {
+    try {
+      const response = await fetch('/api/bookings');
+      if (!response.ok) throw new Error('Failed to fetch bookings');
+      const data = await response.json();
+
+      // Map API response to Booking interface, handling status
+      const now = new Date();
+      const bookings = data.map((booking: any) => ({
+        ...booking,
+        status: booking.status === 'pending' ? 'upcoming' : booking.status, // Map pending to upcoming
+        date: booking.date, // Ensure date is preserved
+      }));
+
+      const current = bookings.filter((booking: Booking) => {
+        const bookingDate = new Date(booking.date + 'T' + booking.time);
+        return (booking.status === 'upcoming' || booking.status === 'in-progress') &&
+               bookingDate >= now;
+      });
+
+      const past = bookings.filter((booking: Booking) => {
+        const bookingDate = new Date(booking.date + 'T' + booking.time);
+        return (booking.status === 'completed' || booking.status === 'cancelled') ||
+               bookingDate < now;
+      });
+
+      setCurrentBookings(current);
+      setPastBookings(past);
+    } catch (error) {
+      console.error('Error fetching bookings:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  fetchBookings();
+}, []);
 
   const getStatusColor = (status: string) => {
     switch (status) {
       case "upcoming":
-        return "bg-blue-100 text-blue-800 border-blue-200"
+        return "bg-blue-100 text-blue-800 border-blue-200";
       case "in-progress":
-        return "bg-green-100 text-green-800 border-green-200"
+        return "bg-green-100 text-green-800 border-green-200";
       case "completed":
-        return "bg-primary/10 text-primary border-primary/20"
+        return "bg-primary/10 text-primary border-primary/20";
       case "cancelled":
-        return "bg-red-100 text-red-800 border-red-200"
+        return "bg-red-100 text-red-800 border-red-200";
       default:
-        return "bg-gray-100 text-gray-800 border-gray-200"
+        return "bg-gray-100 text-gray-800 border-gray-200";
     }
-  }
+  };
 
   const getStatusIcon = (status: string) => {
     switch (status) {
       case "upcoming":
-        return <Clock className="h-4 w-4" />
+        return <Clock className="h-4 w-4" />;
       case "in-progress":
-        return <Navigation className="h-4 w-4" />
+        return <Navigation className="h-4 w-4" />;
       case "completed":
-        return <Car className="h-4 w-4" />
+        return <Car className="h-4 w-4" />;
       case "cancelled":
-        return <Clock className="h-4 w-4" />
+        return <Clock className="h-4 w-4" />;
       default:
-        return <Clock className="h-4 w-4" />
+        return <Clock className="h-4 w-4" />;
     }
-  }
+  };
 
   const BookingCard = ({ booking }: { booking: Booking }) => (
     <Card className="hover:shadow-md transition-shadow">
@@ -229,7 +198,18 @@ export default function DashboardPage() {
         )}
       </CardContent>
     </Card>
-  )
+  );
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="text-center space-y-4">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
+          <p className="text-muted-foreground">Loading your bookings...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-background">
@@ -289,7 +269,7 @@ export default function DashboardPage() {
                   <Car className="h-6 w-6 text-primary" />
                 </div>
                 <div>
-                  <p className="text-2xl font-bold">12</p>
+                  <p className="text-2xl font-bold">{currentBookings.length + pastBookings.length}</p>
                   <p className="text-sm text-muted-foreground">Total Trips</p>
                 </div>
               </div>
@@ -303,7 +283,7 @@ export default function DashboardPage() {
                   <Navigation className="h-6 w-6 text-green-600" />
                 </div>
                 <div>
-                  <p className="text-2xl font-bold">2</p>
+                  <p className="text-2xl font-bold">{currentBookings.length}</p>
                   <p className="text-sm text-muted-foreground">Active Bookings</p>
                 </div>
               </div>
@@ -317,7 +297,10 @@ export default function DashboardPage() {
                   <MapPin className="h-6 w-6 text-blue-600" />
                 </div>
                 <div>
-                  <p className="text-2xl font-bold">8,420</p>
+                  <p className="text-2xl font-bold">
+                    {currentBookings.reduce((sum, b) => sum + b.distance, 0) +
+                      pastBookings.reduce((sum, b) => sum + b.distance, 0)}
+                  </p>
                   <p className="text-sm text-muted-foreground">Total Distance (km)</p>
                 </div>
               </div>
@@ -331,7 +314,9 @@ export default function DashboardPage() {
                   <Star className="h-6 w-6 text-yellow-600" />
                 </div>
                 <div>
-                  <p className="text-2xl font-bold">4.8</p>
+                  <p className="text-2xl font-bold">
+                    {pastBookings.reduce((sum, b) => sum + (b.rating || 0), 0) / Math.max(pastBookings.length, 1) || 0}
+                  </p>
                   <p className="text-sm text-muted-foreground">Average Rating</p>
                 </div>
               </div>
@@ -425,5 +410,5 @@ export default function DashboardPage() {
         </Card>
       </div>
     </div>
-  )
+  );
 }
