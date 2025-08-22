@@ -5,8 +5,18 @@ declare global {
   var _mongoClientPromise: Promise<MongoClient> | undefined;
 }
 
-const uri = 'mongodb://localhost:27017'; // Localhost URI
-const dbName = 'Wardha_Cab_Booking';
+// Ensure environment variables are defined
+const uri = process.env.MONGODB_URI;
+const dbName = process.env.MONGODB_DB;
+
+
+if (!uri) {
+  throw new Error('Please define the MONGODB_URI environment variable in .env.local');
+}
+
+if (!dbName) {
+  throw new Error('Please define the MONGODB_DB environment variable in .env.local');
+}
 
 let client: MongoClient | null = null;
 let clientPromise: Promise<MongoClient>;
