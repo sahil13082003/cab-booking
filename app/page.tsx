@@ -81,7 +81,7 @@ export default function HomePage() {
             <div className="space-y-8">
               <div className="space-y-4">
                 <Badge variant="secondary" className="w-fit">
-                  Trusted by 1000+ Customers
+                  Trusted by 100+ Customers
                 </Badge>
                 <h1 className="font-serif font-black text-4xl lg:text-6xl text-foreground leading-tight">
                   Reliable Cabs from
